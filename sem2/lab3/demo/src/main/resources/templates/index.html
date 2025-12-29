@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Task List</title>
+</head>
+<body>
+
+<h2>Task List</h2>
+
+<form action="/addTask" method="post">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+    <input type="text" name="title" placeholder="New task" required/>
+    <button type="submit">Add</button>
+</form>
+
+<hr/>
+
+<ul>
+    <li th:each="task : ${tasks}">
+        <span th:text="${task.title}"></span>
+        <span th:text="${task.completed} ? '[DONE]' : '[TODO]'"></span>
+
+        <!-- Обновление -->
+        <form th:action="@{'/updateTask/' + ${task.id}}" method="post" style="display:inline">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <input type="hidden" name="completed" value="true"/>
+            <button type="submit">Complete</button>
+        </form>
+
+        <!-- Удаление -->
+        <a th:href="@{'/deleteTask/' + ${task.id}}">Delete</a>
+    </li>
+</ul>
+
+</body>
+</html>
