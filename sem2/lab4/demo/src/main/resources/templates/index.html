@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>ToDo Tracker</title>
+</head>
+<body>
+<h1>ToDo List</h1>
+
+<!-- Показываем имя пользователя, если вошёл -->
+<div th:if="${#authentication != null && #authentication.isAuthenticated()}">
+    Вы вошли как: <b th:text="${#authentication.name}"></b>
+    (<a th:href="@{/logout}">Выйти</a>)
+</div>
+
+<ul>
+    <!-- Цикл по всем задачам -->
+    <li th:each="task : ${tasks}">
+        <!-- Описание задачи -->
+        <span th:text="${task.description}"></span>
+        <!-- Статус задачи -->
+        <span th:text="${task.completed ? '✅ Выполнено' : '⏳ В работе'}"></span>
+
+        <!-- Блок действий (виден только MODERATOR) -->
+        <div th:if="${#authentication != null && #authentication.authorities.contains('ROLE_MODERATOR')}">
+            <!-- Ссылка для удаления задачи -->
+            <a th:href="@{/deleteTask/{id}(id=${task.id})}" style="margin-left:10px; color:red;">Удалить</a>
+
+            <!-- Форма для обновления статуса задачи -->
+            <form th:action="@{/updateTask/{id}(id=${task.id})}" method="post" style="display:inline;">
+                <input type="hidden" name="completed" value="true" th:if="${!task.completed}"/>
+                <button type="submit" th:text="${task.completed ? 'Пометить как невыполненную' : 'Пометить как выполненную'}"></button>
+            </form>
+        </div>
+    </li>
+</ul>
+
+<h2>Add New Task</h2>
+<!-- Форма для добавления новой задачи -->
+<form th:action="@{/addTask}" method="post">
+    <label for="description">Description:</label>
+    <input type="text" id="description" name="description" required>
+    <button type="submit">Add Task</button>
+</form>
+
+</body>
+</html>
